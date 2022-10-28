@@ -1,5 +1,6 @@
-module matvec3_part3(clk, reset, input_valid, input_ready,
-                    input_data, output_valid, output_ready, output_data, new_matrix);
+
+module matvec8_part3(clk, reset, input_valid, input_ready,
+input_data, new_matrix, output_valid, output_ready, output_data);
 
     input   logic clk, reset, input_valid, output_ready, new_matrix;
     input   logic signed [13:0] input_data;
@@ -42,4 +43,4 @@ module matvec3_part3(clk, reset, input_valid, input_ready,
         .output_data(output_data)
     );
 
-endmodule: matvec3_part3
+endmodule: matvec8_part3
