@@ -1,0 +1,12 @@
+module multiplier#(
+    parameter WIDTH = 14
+    localparam RESULT_WIDTH = 2*WIDTH;
+)(
+    input  logic signed [WIDTH-1:0] A,
+    input  logic signed [WIDTH-1:0] B,
+    output logic signed [RESULT_WIDTH-1:0] S
+);
+
+    assign S = $signed(A) * $signed(B);
+
+endmodule: multiplier
