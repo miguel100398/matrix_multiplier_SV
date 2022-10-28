@@ -14,7 +14,6 @@ module control_part4(
     output  logic           output_valid
 );
 
-//TODO: optimize states
 //TODO: Add more memories and multipliers to increase parallelism
 //TODO: Add pipeline Mult 7 stages + adders
 
@@ -54,7 +53,7 @@ end
 always_comb begin 
     case(state)
         RST: begin 
-            next_state = WAIT_W;
+            next_state = WAIT_NEW_MATRIX;
         end
         WAIT_NEW_MATRIX : begin
             if (input_valid) begin 

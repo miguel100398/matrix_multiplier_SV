@@ -8,7 +8,7 @@
 //    - uses these random control values to decide when to give new input and receive output
 //    - automatically checks expected output is correct
 
-module tbench4();
+module tbench4_perf();
 
    parameter numInputs = 100;
    parameter K = 8;
