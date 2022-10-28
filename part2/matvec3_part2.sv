@@ -1,5 +1,7 @@
+
 module matvec3_part2(clk, reset, input_valid, input_ready,
-                    input_data, output_valid, output_ready, output_data, new_matrix);
+input_data, new_matrix, output_valid, output_ready, output_data);
+
 
     input   logic clk, reset, input_valid, output_ready, new_matrix;
     input   logic signed [13:0] input_data;
