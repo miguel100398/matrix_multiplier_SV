@@ -11,25 +11,21 @@ module datapath_part4(
     output logic signed [27:0]   output_data
 );
 
-logic signed [13:0] data_x;
-logic signed [13:0] data_w;
 logic signed [13:0] data_x_mem[8];
 logic signed [13:0] data_w_mem[8];
 logic wr_en_x_mem[8];
 logic wr_en_w_mem[8];
 
-logic signed [27:0] mult_result;
+logic signed [27:0] mult_results[8];
 
 logic signed [27:0] adder_result;
 logic signed [27:0] reg_accum;
 
 logic [2:0] prev_addr_x;
-logic [5:0] prev_addr_w;
 
 assign output_data = reg_accum;
 
 always_ff @(posedge clk) begin
-    prev_addr_w <= addr_w;
     prev_addr_x <= addr_x;
 end
 
@@ -52,7 +48,6 @@ generate
     end
 endgenerate
 
-assign data_x = data_x_mem[prev_addr_x];
 
 //Memories W
 generate
@@ -74,21 +69,26 @@ generate
     end
 endgenerate
 
-assign data_w = data_w_mem[prev_addr_w[2:0]];
 
-//Multiplier
-multiplier #(
-    .WIDTH(14)
-) mult(
-    .A(data_x),
-    .B(data_w),
-    .S(mult_result)
-);
+//Multipliers
+generate
+    for (genvar i=0; i<8; i++) begin : gen_multipliers
+        
+        multiplier #(
+            .WIDTH(14)
+        ) mult(
+            .A(data_x_mem[i]),
+            .B(data_w_mem[i]),
+            .S(mult_results[i])
+        );
+
+    end
+endgenerate
 
 adder_sat #(
     .WIDTH(28)
 ) adder(
-    .A(mult_result),
+    .A(mult_results[prev_addr_x]),
     .B(reg_accum),
     .S(adder_result)
 );
