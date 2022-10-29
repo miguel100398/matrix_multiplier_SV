@@ -43,11 +43,11 @@ module tbench1();
 
    // Put our test data into this array. These are the values we will feed as input into the system.
    logic [13:0] invals[(K*K+K)*numInputs-1:0]; //hold input data   
-   initial $readmemh("D:/migue/Documents/Freelancer/DigitalSystems/Abrar/matrix_multiplier/part1/random_in.hex", invals);     //get and store input data from file inputData
+   initial $readmemh("random_in.hex", invals);     //get and store input data from file inputData
 
     // Store the expected values in another array
     logic signed [27:0] expectedOut[K*numInputs-1:0];
-    initial $readmemh("D:/migue/Documents/Freelancer/DigitalSystems/Abrar/matrix_multiplier/part1/expected_out.hex", expectedOut);   
+    initial $readmemh("expected_out.hex", expectedOut);   
 
    logic [31:0] j;
 
