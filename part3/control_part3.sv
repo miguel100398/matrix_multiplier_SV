@@ -50,7 +50,7 @@ end
 always_comb begin 
     case(state)
         RST: begin 
-            next_state = WAIT_W;
+            next_state = WAIT_NEW_MATRIX;
         end
         WAIT_NEW_MATRIX : begin
             if (input_valid) begin 
