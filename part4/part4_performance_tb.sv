@@ -10,7 +10,7 @@
 
 module tbench4_perf();
 
-   parameter numInputs = 100;
+   parameter numInputs = 50000;
    parameter K = 8;
    
    logic               clk, reset, input_valid, input_ready, output_valid, output_ready, new_matrix;
@@ -19,6 +19,7 @@ module tbench4_perf();
    logic signed [27:0] output_data;
 
    integer num_clocks = 0;
+   integer num_clocks_process = 0;
 
    initial clk=0;
    always #5 clk = ~clk;
@@ -40,6 +41,7 @@ module tbench4_perf();
       //Set rb and rb2 to 1 to always send and receive data (back2back)
       rb = 1'b1;
       rb2 = 1'b1;
+      //std::randomize(rb, rb2); // randomize rb
    end
 
    
@@ -119,6 +121,13 @@ module tbench4_perf();
       num_clocks++;
    end
 
+   //Count number of clocks to process data
+   always @(posedge clk) begin
+      if (~input_ready) begin //Data is being processed
+         num_clocks_process++;
+      end
+   end
+
    ////////////////////////////////////////////////////////////////////////////////
 
    initial begin
@@ -134,8 +143,12 @@ module tbench4_perf();
 
       wait(i==K*numInputs);
 
+      //Get average of num clocks to process data
+      num_clocks_process = num_clocks_process / numInputs;
+
       $display("\n------------- simulation finished ------------------");
       $display("Num clocks: %0d", num_clocks);
+      $display("Num clocks to process each nmatrix(average): %0d", num_clocks_process);
       $display("Simulated ", numInputs, " matrix-vector products");
       if (errors > 0) 
          $display("Detected ", errors, " errors");

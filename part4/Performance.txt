@@ -1,0 +1,15 @@
+No_opt (100 operations)
+	total 12451
+	process 80
+
+No_opt (50000 operations)
+	total 6010563
+	process 80
+
+Opt_Parallelism (100 operations)
+	total 6851 
+	process 24
+
+Opt_Parallelism (50000 operations)
+	total 3210563 
+	process 24

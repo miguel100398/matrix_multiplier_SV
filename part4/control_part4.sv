@@ -24,12 +24,15 @@ state_t state, next_state;
 
 logic[5:0] cntr1;
 logic[2:0] cntr2;
+logic[2:0] cntr3;
+logic[2:0] cntr2_prev;
 
 logic en_cntr1;
 logic en_cntr2;
 
 logic cntr1_done;
 logic cntr2_done;
+logic cntr3_done;
 
 logic en_acc_q;
 
@@ -37,8 +40,14 @@ logic set_done_mult;
 logic done_mult;
 logic clear_done_mult;
 
+logic waiting_output_ready;
+
+logic output_valid_q[3];
+
 assign cntr1_done = (cntr1 == 6'd63);
 assign cntr2_done = (cntr2 == 3'd7);
+assign cntr3_done = (cntr3 == 3'd7);
+
 
 //FSM
 always_ff @(posedge clk) begin 
@@ -81,9 +90,9 @@ always_comb begin
             end
         end
         MULT: begin 
-            if (cntr2_done) begin 
-                next_state = WAIT_RESULT;
-            end else begin 
+            if (cntr3_done && ~waiting_output_ready) begin
+                next_state = WAIT_NEW_MATRIX;
+            end else begin
                 next_state = MULT;
             end
         end
@@ -114,13 +123,14 @@ always_comb begin
     addr_w  = 3'b0;
     wr_en_w = 1'b0;
     clear_acc = 1'b0;
-    en_acc_q  = 1'b0;
+    en_acc  = 1'b0;
     input_ready = 1'b0;
-    output_valid = 1'b0;
+    output_valid_q[2] = 1'b0;
     en_cntr1 = 1'b0;
     en_cntr2 = 1'b0;
     clear_done_mult = 1'b0;
     set_done_mult = 1'b0;
+    output_valid = 1'b0;
     case(state)
         RST: begin
            clear_acc = 1'b1; 
@@ -149,16 +159,17 @@ always_comb begin
             input_ready = 1'b1;
         end
         MULT: begin
-            addr_w = cntr1;
-            addr_x = cntr2;
-            en_acc_q = 1'b1;
-            en_cntr1 = 1'b1;
-            en_cntr2 = 1'b1;
-            set_done_mult = (cntr1_done && cntr2_done);
+            addr_w[5:3] = (~waiting_output_ready) ? cntr2 : cntr2_prev;
+            addr_w[2:0] = 3'b0;
+            addr_x = (~waiting_output_ready) ? cntr2 : cntr2_prev;
+            en_acc = ~waiting_output_ready;
+            en_cntr2 = ~waiting_output_ready;
+            set_done_mult = (cntr2_done);
+            output_valid_q[2] = 1'b1;
+            output_valid = output_valid_q[0];
         end
         SEND_DATA: begin
             clear_acc = output_ready;
-            output_valid = 1'b1; 
         end
         default: begin
             addr_x  = 2'b0;
@@ -166,18 +177,12 @@ always_comb begin
             addr_w  = 3'b0;
             wr_en_w = 1'b0;
             clear_acc = 1'b0;
-            en_acc_q  = 1'b0;
+            en_acc  = 1'b0;
             input_ready = 1'b0;
-            output_valid = 1'b0;
             en_cntr1 = 1'b0;
             en_cntr2 = 1'b0;
         end
     endcase
-end
-
-//Delayy en_acc 1 cycle
-always_ff @(posedge clk) begin
-    en_acc <= en_acc_q;
 end
 
 //done_mult
@@ -188,6 +193,18 @@ always_ff @(posedge clk) begin
         done_mult <= 1'b0;
     end
 end
+
+//Waiting output ready
+assign waiting_output_ready = output_valid && ~output_ready;
+
+//Delay output valid
+always_ff @(posedge clk) begin
+    output_valid_q[1] <= output_valid_q[2];
+    output_valid_q[0] <= output_valid_q[1];
+end
+
+//Previous value of counter2
+assign cntr2_prev = cntr2 - 1'b1;
 
 ///Counters
 always_ff @(posedge clk) begin 
@@ -206,11 +223,21 @@ always_ff @(posedge clk) begin
     if (rst) begin 
         cntr2 <= 3'b0;
     end else if (en_cntr2) begin 
-        if (cntr2_done) begin 
+        if (cntr2_done || (next_state == WAIT_NEW_MATRIX)) begin 
             cntr2 <= 3'b0;
         end else begin 
             cntr2 <= cntr2 + 1'b1;
         end
+    end
+end
+
+always_ff @(posedge clk) begin 
+    if (rst) begin 
+        cntr3 <= 3'b0;
+    end else if (cntr3_done && ~waiting_output_ready) begin 
+        cntr3 <= 3'b0;
+    end else if (output_valid && output_ready) begin 
+        cntr3 <= cntr3 + 1'b1;
     end
 end
 
