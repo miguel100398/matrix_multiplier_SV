@@ -12,7 +12,7 @@ module control_part4(
     output  logic           en_acc,
     output  logic           input_ready,
     output  logic           output_valid,
-    output  logic           en_reg_mult
+    output  logic           en_pipe
 );
 
 //TODO: Add more memories and multipliers to increase parallelism
@@ -43,7 +43,7 @@ logic clear_done_mult;
 
 logic waiting_output_ready;
 
-logic output_valid_q[4];
+logic output_valid_q[5];
 
 assign cntr1_done = (cntr1 == 6'd63);
 assign cntr2_done = (cntr2 == 3'd7);
@@ -126,13 +126,13 @@ always_comb begin
     clear_acc = 1'b0;
     en_acc  = 1'b0;
     input_ready = 1'b0;
-    output_valid_q[3] = 1'b0;
+    output_valid_q[4] = 1'b0;
     en_cntr1 = 1'b0;
     en_cntr2 = 1'b0;
     clear_done_mult = 1'b0;
     set_done_mult = 1'b0;
     output_valid = 1'b0;
-    en_reg_mult = 1'b0;
+    en_pipe = 1'b0;
     case(state)
         RST: begin
            clear_acc = 1'b1; 
@@ -167,9 +167,9 @@ always_comb begin
             en_acc = ~waiting_output_ready;
             en_cntr2 = ~waiting_output_ready;
             set_done_mult = (cntr2_done);
-            output_valid_q[3] = 1'b1;
+            output_valid_q[4] = 1'b1;
             output_valid = output_valid_q[0];
-            en_reg_mult = (~waiting_output_ready);
+            en_pipe = (~waiting_output_ready);
         end
         SEND_DATA: begin
             clear_acc = output_ready;
@@ -205,7 +205,7 @@ assign waiting_output_ready = output_valid && ~output_ready;
 // 1        +     1     +     1      +   1    +    1
 
 generate
-    for (genvar i=0; i<3; i++) begin : gen_output_valid_delay
+    for (genvar i=0; i<4; i++) begin : gen_output_valid_delay
         always_ff @(posedge clk) begin
             output_valid_q[i] <= output_valid_q[i+1];
         end

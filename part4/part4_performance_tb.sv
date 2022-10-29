@@ -10,7 +10,7 @@
 
 module tbench4_perf();
 
-   parameter numInputs = 100;
+   parameter numInputs = 50000;
    parameter K = 8;
    
    logic               clk, reset, input_valid, input_ready, output_valid, output_ready, new_matrix;
@@ -39,9 +39,9 @@ module tbench4_perf();
       @(posedge clk);
       #1;
       //Set rb and rb2 to 1 to always send and receive data (back2back)
-      //rb = 1'b1;
-      //rb2 = 1'b1;
-      std::randomize(rb, rb2); // randomize rb
+      rb = 1'b1;
+      rb2 = 1'b1;
+      //std::randomize(rb, rb2); // randomize rb
    end
 
    
