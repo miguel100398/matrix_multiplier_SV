@@ -12,6 +12,7 @@ input_data, new_matrix, output_valid, output_ready, output_data);
     logic wr_en_w;
     logic clear_acc;
     logic en_acc;
+    logic en_reg_mult;
 
     control_part4 control(
         .clk(clk),
@@ -20,6 +21,7 @@ input_data, new_matrix, output_valid, output_ready, output_data);
         .output_ready(output_ready),
         .new_matrix(new_matrix),
         .addr_x(addr_x),
+        .en_reg_mult(en_reg_mult),
         .wr_en_x(wr_en_x),
         .addr_w(addr_w),
         .wr_en_w(wr_en_w),
@@ -39,7 +41,8 @@ input_data, new_matrix, output_valid, output_ready, output_data);
         .wr_en_w(wr_en_w),
         .clear_acc(clear_acc),
         .en_acc(en_acc),
-        .output_data(output_data)
+        .output_data(output_data),
+        .en_reg_mult(en_reg_mult)
     );
 
 endmodule: matvec8_part4

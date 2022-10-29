@@ -8,6 +8,7 @@ module datapath_part4(
     input  logic                 wr_en_w,
     input  logic                 clear_acc,
     input  logic                 en_acc,
+    input  logic                 en_reg_mult,
     output logic signed [27:0]   output_data
 );
 
@@ -17,6 +18,7 @@ logic wr_en_x_mem[8];
 logic wr_en_w_mem[8];
 
 logic signed [27:0] mult_results[8];
+logic signed [27:0] mult_results_reg[8];
 
 logic signed [27:0] adder_results[7];
 logic signed [27:0] reg_accum;
@@ -85,21 +87,28 @@ generate
     end
 endgenerate
 
+//Register Multiplieer result
+always_ff @(posedge clk) begin
+    if (en_reg_mult) begin
+        mult_results_reg <= mult_results;
+    end
+end
+
 //Adders
 generate
     //First adder
     adder_sat#(
         .WIDTH(28)
     ) adder_0(
-        .A(mult_results[0]),
-        .B(mult_results[1]),
+        .A(mult_results_reg[0]),
+        .B(mult_results_reg[1]),
         .S(adder_results[0])
     );
     for (genvar i=0; i<6; i++) begin : gen_adders
         adder_sat #(
             .WIDTH(28)
         ) adder (
-            .A(mult_results[i+2]),
+            .A(mult_results_reg[i+2]),
             .B(adder_results[i]),
             .S(adder_results[i+1])
         );
