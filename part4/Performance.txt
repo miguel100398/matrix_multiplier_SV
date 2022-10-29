@@ -21,3 +21,11 @@ Opt_Parallelism_states (100 operations)
 Opt_Parallelism_states (50000 operations)
 	total 2510563 
 	process 10
+
+Opt_Parallelism_states_pipe (100 operations)
+	total 5651 
+	process 12
+
+Opt_Parallelism_states_pipe (50000 operations)
+	total 2610563 
+	process 12

@@ -25,17 +25,15 @@ logic signed [27:0] adder_results[7];
 logic signed [27:0] adder_result_reg;
 logic signed [27:0] reg_accum;
 
-logic [2:0] prev_addr_x;
+
+genvar i;
 
 assign output_data = reg_accum;
 
-always_ff @(posedge clk) begin
-    prev_addr_x <= addr_x;
-end
 
 //Memories X
 generate
-    for (genvar i=0; i<8; i++) begin : gen_x_memories
+    for (i=0; i<8; i++) begin : gen_x_memories
 
         assign wr_en_x_mem[i] = (wr_en_x && (addr_x==i));
 
@@ -55,7 +53,7 @@ endgenerate
 
 //Memories W
 generate
-    for (genvar i=0; i<8; i++) begin : gen_w_memories
+    for (i=0; i<8; i++) begin : gen_w_memories
 
         assign wr_en_w_mem[i] = (wr_en_w && (addr_w[2:0]==i));
 
@@ -76,7 +74,7 @@ endgenerate
 
 //Multipliers
 generate
-    for (genvar i=0; i<8; i++) begin : gen_multipliers
+    for (i=0; i<8; i++) begin : gen_multipliers
         
         multiplier #(
             .WIDTH(14)
@@ -108,7 +106,7 @@ generate
         .S(adder_results[0])
     );
     //Adders 1-3
-    for (genvar i=0; i<3; i++) begin : gen_adders_1_3
+    for (i=0; i<3; i++) begin : gen_adders_1_3
         adder_sat #(
             .WIDTH(28)
         ) adder (
@@ -125,7 +123,7 @@ generate
         .B(adder_result_reg),
         .S(adder_results[4])
     );
-    for (genvar i=4; i<6; i++) begin : gen_adders_5_6
+    for (i=4; i<6; i++) begin : gen_adders_5_6
         adder_sat#(
         .WIDTH(28)
     ) adder_4(

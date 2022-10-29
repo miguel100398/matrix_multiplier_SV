@@ -45,6 +45,8 @@ logic waiting_output_ready;
 
 logic output_valid_q[5];
 
+genvar i;
+
 assign cntr1_done = (cntr1 == 6'd63);
 assign cntr2_done = (cntr2 == 3'd7);
 assign cntr3_done = (cntr3 == 3'd7);
@@ -205,7 +207,7 @@ assign waiting_output_ready = output_valid && ~output_ready;
 // 1        +     1     +     1      +   1    +    1
 
 generate
-    for (genvar i=0; i<4; i++) begin : gen_output_valid_delay
+    for (i=0; i<4; i++) begin : gen_output_valid_delay
         always_ff @(posedge clk) begin
             output_valid_q[i] <= output_valid_q[i+1];
         end
